@@ -403,8 +403,28 @@ function renderTable() {
 
     // 정렬 적용
     const sorted = [...filteredData].sort((a, b) => {
-        let aVal = a[getColumnKey(sortColumn)];
-        let bVal = b[getColumnKey(sortColumn)];
+        let aVal, bVal;
+
+        // 컬럼 타입에 따라 값 가져오기
+        const columnType = getColumnType(sortColumn);
+
+        if (columnType === 'sales') {
+            // 판매 데이터에서 직접 가져오기
+            aVal = a[getColumnKey(sortColumn)];
+            bVal = b[getColumnKey(sortColumn)];
+        } else if (columnType === 'client') {
+            // 거래처 데이터에서 가져오기
+            const aClient = clientData.find(c => c['거래처코드'] === a['거래처코드']) || {};
+            const bClient = clientData.find(c => c['거래처코드'] === b['거래처코드']) || {};
+            aVal = aClient[getColumnKey(sortColumn)];
+            bVal = bClient[getColumnKey(sortColumn)];
+        } else if (columnType === 'product') {
+            // 제품 데이터에서 가져오기
+            const aProduct = productData.find(p => p['제품코드'] === a['제품코드']) || {};
+            const bProduct = productData.find(p => p['제품코드'] === b['제품코드']) || {};
+            aVal = aProduct[getColumnKey(sortColumn)];
+            bVal = bProduct[getColumnKey(sortColumn)];
+        }
 
         // 숫자 비교
         if (typeof aVal === 'number' && typeof bVal === 'number') {
@@ -425,16 +445,34 @@ function renderTable() {
 
     // 테이블 행 생성
     pageData.forEach(item => {
+        // 거래처 정보 가져오기
+        const client = clientData.find(c => c['거래처코드'] === item['거래처코드']) || {};
+
+        // 제품 정보 가져오기
+        const product = productData.find(p => p['제품코드'] === item['제품코드']) || {};
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${item['날짜'] || '-'}</td>
-            <td>${item['거래처코드'] || '-'}</td>
-            <td>${item['거래처명'] || '-'}</td>
-            <td>${item['제품코드'] || '-'}</td>
+            <td>${item['주문번호'] || '-'}</td>
             <td>${formatNumber(item['수량'] || 0)}</td>
             <td>${formatNumber(item['금액'] || 0)}</td>
-            <td>${item['주문번호'] || '-'}</td>
             <td>${item['할인율'] ? item['할인율'].toFixed(1) : '0.0'}</td>
+            <td>${item['거래처코드'] || '-'}</td>
+            <td>${client['거래처명(러시아어)'] || '-'}</td>
+            <td>${client['거래처명(한국어)'] || '-'}</td>
+            <td>${client['내수수출구분'] || '-'}</td>
+            <td>${client['나라'] || '-'}</td>
+            <td>${client['지역'] || '-'}</td>
+            <td>${client['대리점연방체인구분'] || '-'}</td>
+            <td>${item['제품코드'] || '-'}</td>
+            <td>${product['CP/NCP'] || '-'}</td>
+            <td>${product['판매지'] || '-'}</td>
+            <td>${product['대분류'] || '-'}</td>
+            <td>${product['지역'] || '-'}</td>
+            <td>${product['맛'] || '-'}</td>
+            <td>${product['패키지'] || '-'}</td>
+            <td>${product['비고'] || '-'}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -445,16 +483,44 @@ function renderTable() {
 
 function getColumnKey(column) {
     const columnMap = {
+        // 판매 데이터 (5개)
         'date': '날짜',
-        'clientCode': '거래처코드',
-        'clientName': '거래처명',
-        'productCode': '제품코드',
+        'orderNumber': '주문번호',
         'quantity': '수량',
         'amount': '금액',
-        'orderNumber': '주문번호',
-        'discount': '할인율'
+        'discount': '할인율',
+
+        // 거래처 데이터 (7개)
+        'clientCode': '거래처코드',
+        'clientNameRu': '거래처명(러시아어)',
+        'clientNameKr': '거래처명(한국어)',
+        'domesticExport': '내수수출구분',
+        'country': '나라',
+        'region': '지역',
+        'dealerChain': '대리점연방체인구분',
+
+        // 제품 데이터 (8개)
+        'productCode': '제품코드',
+        'cpncp': 'CP/NCP',
+        'salesRegion': '판매지',
+        'category': '대분류',
+        'brand': '지역',
+        'taste': '맛',
+        'package': '패키지',
+        'note': '비고'
     };
     return columnMap[column] || '날짜';
+}
+
+function getColumnType(column) {
+    const salesColumns = ['date', 'orderNumber', 'quantity', 'amount', 'discount', 'clientCode', 'productCode'];
+    const clientColumns = ['clientNameRu', 'clientNameKr', 'domesticExport', 'country', 'region', 'dealerChain'];
+    const productColumns = ['cpncp', 'salesRegion', 'category', 'brand', 'taste', 'package', 'note'];
+
+    if (salesColumns.includes(column)) return 'sales';
+    if (clientColumns.includes(column)) return 'client';
+    if (productColumns.includes(column)) return 'product';
+    return 'sales';
 }
 
 // ============================================

@@ -212,18 +212,33 @@
                 <table id="salesTable">
                     <thead>
                         <tr>
+                            <!-- 판매 데이터 -->
                             <th class="sortable" data-column="date">날짜</th>
-                            <th class="sortable" data-column="clientCode">거래처코드</th>
-                            <th class="sortable" data-column="clientName">거래처명</th>
-                            <th class="sortable" data-column="productCode">제품코드</th>
+                            <th class="sortable" data-column="orderNumber">주문번호</th>
                             <th class="sortable" data-column="quantity">수량(박스)</th>
                             <th class="sortable" data-column="amount">금액(루블)</th>
-                            <th class="sortable" data-column="orderNumber">주문번호</th>
                             <th class="sortable" data-column="discount">할인율(%)</th>
+                            <!-- 거래처 데이터 -->
+                            <th class="sortable" data-column="clientCode">거래처코드</th>
+                            <th class="sortable" data-column="clientNameRu">거래처명(러)</th>
+                            <th class="sortable" data-column="clientNameKr">거래처명(한)</th>
+                            <th class="sortable" data-column="domesticExport">내수/수출</th>
+                            <th class="sortable" data-column="country">나라</th>
+                            <th class="sortable" data-column="region">지역</th>
+                            <th class="sortable" data-column="dealerChain">대리점/연방체인</th>
+                            <!-- 제품 데이터 -->
+                            <th class="sortable" data-column="productCode">제품코드</th>
+                            <th class="sortable" data-column="cpncp">CP/NCP</th>
+                            <th class="sortable" data-column="salesRegion">판매지</th>
+                            <th class="sortable" data-column="category">카테고리</th>
+                            <th class="sortable" data-column="brand">브랜드</th>
+                            <th class="sortable" data-column="taste">맛</th>
+                            <th class="sortable" data-column="package">패키지</th>
+                            <th class="sortable" data-column="note">비고</th>
                         </tr>
                     </thead>
                     <tbody id="salesTableBody">
-                        <!-- 데이터가 JavaScript로 삽입됩니다 -->
+                        <!-- 데이터가 JavaScript로 삽입됩니다 (20개 열) -->
                     </tbody>
                 </table>
             </div>
