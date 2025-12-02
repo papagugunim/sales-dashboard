@@ -334,9 +334,17 @@ function resetFilters() {
 // 요약 카드 업데이트
 // ============================================
 function updateSummaryCards() {
-    // 총 판매금액
+    // 총 판매금액 (루블)
     const totalAmount = filteredData.reduce((sum, item) => sum + (item['금액'] || 0), 0);
-    document.getElementById('totalAmount').textContent = formatNumber(Math.round(totalAmount));
+
+    // 백만 루블 단위로 변환
+    const totalAmountMillion = totalAmount / 1000000;
+    document.getElementById('totalAmount').textContent = formatNumber(totalAmountMillion.toFixed(1));
+
+    // 원화로 환산 (환율 14.74, 억원 단위)
+    const exchangeRate = 14.74;
+    const totalAmountKRW = (totalAmount * exchangeRate) / 100000000;
+    document.getElementById('totalAmountKRW').textContent = `(${formatNumber(totalAmountKRW.toFixed(1))} 억원)`;
 
     // 총 판매량
     const totalQuantity = filteredData.reduce((sum, item) => sum + (item['수량'] || 0), 0);

@@ -279,6 +279,13 @@ header {
     color: var(--secondary-color);
 }
 
+.card-subvalue {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-top: 8px;
+    font-weight: 500;
+}
+
 .card-value.warning {
     color: var(--warning-color);
 }
