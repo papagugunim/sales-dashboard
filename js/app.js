@@ -2,8 +2,8 @@
 // 판매관리 대시보드 - JavaScript
 // ============================================
 
-// API 설정
-const API_URL = 'https://script.google.com/macros/s/AKfycbwdAM6gdq3AudOlioiEMN7sj0F1p7r8H68GucsxKv4_HYudhVbLju0etd4MJgicRe3tlA/exec';
+// API 설정 (최신 @HEAD 버전 사용)
+const API_URL = 'https://script.google.com/macros/s/AKfycbyvnlXrPlSWxCOQhJVSg_qfAOO8YHtqkUhdxHrYnBi4/exec';
 const API_TOKEN = 'lotte-sales-2024';
 
 // 전역 변수
