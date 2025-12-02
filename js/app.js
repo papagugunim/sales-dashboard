@@ -68,10 +68,19 @@ function setupEventListeners() {
 
     // 필터
     document.getElementById('monthFilter').addEventListener('change', applyFilters);
-    document.getElementById('clientFilter').addEventListener('change', applyFilters);
-    document.getElementById('regionFilter').addEventListener('change', applyFilters);
-    document.getElementById('productFilter').addEventListener('change', applyFilters);
+    document.getElementById('clientCodeFilter').addEventListener('change', applyFilters);
+    document.getElementById('clientNameFilter').addEventListener('change', applyFilters);
+    document.getElementById('domesticExportFilter').addEventListener('change', applyFilters);
+    document.getElementById('countryFilter').addEventListener('change', applyFilters);
+    document.getElementById('regionExportFilter').addEventListener('change', applyFilters);
+    document.getElementById('dealerChainFilter').addEventListener('change', applyFilters);
+    document.getElementById('productCodeFilter').addEventListener('change', applyFilters);
+    document.getElementById('cpncpFilter').addEventListener('change', applyFilters);
     document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+    document.getElementById('brandFilter').addEventListener('change', applyFilters);
+    document.getElementById('tasteFilter').addEventListener('change', applyFilters);
+    document.getElementById('packageFilter').addEventListener('change', applyFilters);
+    document.getElementById('noteFilter').addEventListener('change', applyFilters);
     document.getElementById('searchInput').addEventListener('input', applyFilters);
     document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
 
@@ -201,64 +210,65 @@ async function loadAllData() {
 // 필터 옵션 채우기
 // ============================================
 function populateFilters() {
-    // 월 필터 (판매 데이터에서 추출)
+    // 월 필터
     const months = [...new Set(salesData.map(item => {
         const date = item['날짜'];
-        if (date && date.length >= 7) {
-            return date.substring(0, 7); // YYYY-MM
-        }
+        if (date && date.length >= 7) return date.substring(0, 7);
         return null;
     }).filter(m => m))].sort().reverse();
+    populateSelect('monthFilter', months);
 
-    const monthFilter = document.getElementById('monthFilter');
-    monthFilter.innerHTML = '<option value="all">전체</option>';
-    months.forEach(month => {
-        const option = document.createElement('option');
-        option.value = month;
-        option.textContent = month;
-        monthFilter.appendChild(option);
-    });
+    // 거래처 관련 필터
+    const clientCodes = [...new Set(clientData.map(c => c['거래처코드']).filter(v => v))];
+    populateSelect('clientCodeFilter', clientCodes);
 
-    // 거래처 필터
-    const clientFilter = document.getElementById('clientFilter');
-    clientFilter.innerHTML = '<option value="all">전체</option>';
-    clientData.forEach(client => {
-        const option = document.createElement('option');
-        option.value = client['거래처코드'];
-        option.textContent = `${client['거래처명(러시아어)']} (${client['거래처코드']})`;
-        clientFilter.appendChild(option);
-    });
+    const clientNames = [...new Set(clientData.map(c => c['거래처명(러시아어)']).filter(v => v))];
+    populateSelect('clientNameFilter', clientNames);
 
-    // 지역 필터
-    const regions = [...new Set(clientData.map(c => c['지역']).filter(r => r))];
-    const regionFilter = document.getElementById('regionFilter');
-    regionFilter.innerHTML = '<option value="all">전체</option>';
-    regions.forEach(region => {
-        const option = document.createElement('option');
-        option.value = region;
-        option.textContent = region;
-        regionFilter.appendChild(option);
-    });
+    const domesticExport = [...new Set(clientData.map(c => c['내수수출구분']).filter(v => v))];
+    populateSelect('domesticExportFilter', domesticExport);
 
-    // 제품코드 필터
-    const productFilter = document.getElementById('productFilter');
-    productFilter.innerHTML = '<option value="all">전체</option>';
-    productData.forEach(product => {
-        const option = document.createElement('option');
-        option.value = product['제품코드'];
-        option.textContent = product['제품코드'];
-        productFilter.appendChild(option);
-    });
+    const countries = [...new Set(clientData.map(c => c['나라']).filter(v => v))];
+    populateSelect('countryFilter', countries);
 
-    // 카테고리 필터
-    const categories = [...new Set(productData.map(p => p['대분류']).filter(c => c))];
-    const categoryFilter = document.getElementById('categoryFilter');
-    categoryFilter.innerHTML = '<option value="all">전체</option>';
-    categories.forEach(category => {
+    const regionsExport = [...new Set(clientData.map(c => c['지역']).filter(v => v))];
+    populateSelect('regionExportFilter', regionsExport);
+
+    const dealerChain = [...new Set(clientData.map(c => c['대리점연방체인구분']).filter(v => v))];
+    populateSelect('dealerChainFilter', dealerChain);
+
+    // 제품 관련 필터
+    const productCodes = [...new Set(productData.map(p => p['제품코드']).filter(v => v))];
+    populateSelect('productCodeFilter', productCodes);
+
+    const cpncp = [...new Set(productData.map(p => p['CP/NCP']).filter(v => v))];
+    populateSelect('cpncpFilter', cpncp);
+
+    const categories = [...new Set(productData.map(p => p['대분류']).filter(v => v))];
+    populateSelect('categoryFilter', categories);
+
+    const brands = [...new Set(productData.map(p => p['지역']).filter(v => v))];
+    populateSelect('brandFilter', brands);
+
+    const tastes = [...new Set(productData.map(p => p['맛']).filter(v => v))];
+    populateSelect('tasteFilter', tastes);
+
+    const packages = [...new Set(productData.map(p => p['패키지']).filter(v => v))];
+    populateSelect('packageFilter', packages);
+
+    const notes = [...new Set(productData.map(p => p['비고']).filter(v => v))];
+    populateSelect('noteFilter', notes);
+}
+
+// 헬퍼 함수: 셀렉트 박스 옵션 채우기
+function populateSelect(elementId, values) {
+    const select = document.getElementById(elementId);
+    select.innerHTML = '<option value="all">전체</option>';
+    values.forEach(value => {
         const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
-        categoryFilter.appendChild(option);
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
     });
 }
 
@@ -266,47 +276,60 @@ function populateFilters() {
 // 필터링
 // ============================================
 function applyFilters() {
-    const monthValue = document.getElementById('monthFilter').value;
-    const clientValue = document.getElementById('clientFilter').value;
-    const regionValue = document.getElementById('regionFilter').value;
-    const productValue = document.getElementById('productFilter').value;
-    const categoryValue = document.getElementById('categoryFilter').value;
-    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    // 모든 필터 값 가져오기
+    const filters = {
+        month: document.getElementById('monthFilter').value,
+        clientCode: document.getElementById('clientCodeFilter').value,
+        clientName: document.getElementById('clientNameFilter').value,
+        domesticExport: document.getElementById('domesticExportFilter').value,
+        country: document.getElementById('countryFilter').value,
+        regionExport: document.getElementById('regionExportFilter').value,
+        dealerChain: document.getElementById('dealerChainFilter').value,
+        productCode: document.getElementById('productCodeFilter').value,
+        cpncp: document.getElementById('cpncpFilter').value,
+        category: document.getElementById('categoryFilter').value,
+        brand: document.getElementById('brandFilter').value,
+        taste: document.getElementById('tasteFilter').value,
+        package: document.getElementById('packageFilter').value,
+        note: document.getElementById('noteFilter').value,
+        search: document.getElementById('searchInput').value.toLowerCase()
+    };
 
     filteredData = salesData.filter(item => {
         // 월 필터
-        if (monthValue !== 'all') {
+        if (filters.month !== 'all') {
             const itemMonth = item['날짜'].substring(0, 7);
-            if (itemMonth !== monthValue) return false;
+            if (itemMonth !== filters.month) return false;
         }
 
-        // 거래처 필터
-        if (clientValue !== 'all' && item['거래처코드'] !== clientValue) {
-            return false;
-        }
+        // 거래처 정보 가져오기
+        const client = clientData.find(c => c['거래처코드'] === item['거래처코드']);
 
-        // 지역 필터 (거래처 정보와 매칭)
-        if (regionValue !== 'all') {
-            const client = clientData.find(c => c['거래처코드'] === item['거래처코드']);
-            if (!client || client['지역'] !== regionValue) return false;
-        }
+        // 거래처 관련 필터
+        if (filters.clientCode !== 'all' && item['거래처코드'] !== filters.clientCode) return false;
+        if (filters.clientName !== 'all' && (!client || client['거래처명(러시아어)'] !== filters.clientName)) return false;
+        if (filters.domesticExport !== 'all' && (!client || client['내수수출구분'] !== filters.domesticExport)) return false;
+        if (filters.country !== 'all' && (!client || client['나라'] !== filters.country)) return false;
+        if (filters.regionExport !== 'all' && (!client || client['지역'] !== filters.regionExport)) return false;
+        if (filters.dealerChain !== 'all' && (!client || client['대리점연방체인구분'] !== filters.dealerChain)) return false;
 
-        // 제품 필터
-        if (productValue !== 'all' && item['제품코드'] !== productValue) {
-            return false;
-        }
+        // 제품 정보 가져오기
+        const product = productData.find(p => p['제품코드'] === item['제품코드']);
 
-        // 카테고리 필터 (제품 정보와 매칭)
-        if (categoryValue !== 'all') {
-            const product = productData.find(p => p['제품코드'] === item['제품코드']);
-            if (!product || product['대분류'] !== categoryValue) return false;
-        }
+        // 제품 관련 필터
+        if (filters.productCode !== 'all' && item['제품코드'] !== filters.productCode) return false;
+        if (filters.cpncp !== 'all' && (!product || product['CP/NCP'] !== filters.cpncp)) return false;
+        if (filters.category !== 'all' && (!product || product['대분류'] !== filters.category)) return false;
+        if (filters.brand !== 'all' && (!product || product['지역'] !== filters.brand)) return false;
+        if (filters.taste !== 'all' && (!product || product['맛'] !== filters.taste)) return false;
+        if (filters.package !== 'all' && (!product || product['패키지'] !== filters.package)) return false;
+        if (filters.note !== 'all' && (!product || product['비고'] !== filters.note)) return false;
 
         // 검색 필터
-        if (searchValue) {
+        if (filters.search) {
             const clientName = item['거래처명'] ? item['거래처명'].toLowerCase() : '';
             const productCode = item['제품코드'] ? item['제품코드'].toLowerCase() : '';
-            if (!clientName.includes(searchValue) && !productCode.includes(searchValue)) {
+            if (!clientName.includes(filters.search) && !productCode.includes(filters.search)) {
                 return false;
             }
         }
@@ -322,10 +345,19 @@ function applyFilters() {
 
 function resetFilters() {
     document.getElementById('monthFilter').value = 'all';
-    document.getElementById('clientFilter').value = 'all';
-    document.getElementById('regionFilter').value = 'all';
-    document.getElementById('productFilter').value = 'all';
+    document.getElementById('clientCodeFilter').value = 'all';
+    document.getElementById('clientNameFilter').value = 'all';
+    document.getElementById('domesticExportFilter').value = 'all';
+    document.getElementById('countryFilter').value = 'all';
+    document.getElementById('regionExportFilter').value = 'all';
+    document.getElementById('dealerChainFilter').value = 'all';
+    document.getElementById('productCodeFilter').value = 'all';
+    document.getElementById('cpncpFilter').value = 'all';
     document.getElementById('categoryFilter').value = 'all';
+    document.getElementById('brandFilter').value = 'all';
+    document.getElementById('tasteFilter').value = 'all';
+    document.getElementById('packageFilter').value = 'all';
+    document.getElementById('noteFilter').value = 'all';
     document.getElementById('searchInput').value = '';
     applyFilters();
 }

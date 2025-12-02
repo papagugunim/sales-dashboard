@@ -106,41 +106,97 @@
         </div>
 
         <div class="filters">
+            <!-- 기간 필터 -->
             <div class="filter-group">
                 <label>기간(월):</label>
                 <select id="monthFilter">
                     <option value="all">전체</option>
-                    <!-- JavaScript로 동적 생성 -->
+                </select>
+            </div>
+
+            <!-- 거래처 관련 필터 -->
+            <div class="filter-group">
+                <label>거래처코드:</label>
+                <select id="clientCodeFilter">
+                    <option value="all">전체</option>
                 </select>
             </div>
             <div class="filter-group">
-                <label>거래처:</label>
-                <select id="clientFilter">
+                <label>거래처명(러):</label>
+                <select id="clientNameFilter">
                     <option value="all">전체</option>
-                    <!-- Client DB에서 동적으로 로드됨 -->
                 </select>
             </div>
             <div class="filter-group">
-                <label>지역:</label>
-                <select id="regionFilter">
+                <label>내수/수출:</label>
+                <select id="domesticExportFilter">
                     <option value="all">전체</option>
-                    <!-- Client DB에서 동적으로 로드됨 -->
                 </select>
             </div>
+            <div class="filter-group">
+                <label>나라:</label>
+                <select id="countryFilter">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>지역(수출나라별):</label>
+                <select id="regionExportFilter">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>대리점/연방체인:</label>
+                <select id="dealerChainFilter">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+
+            <!-- 제품 관련 필터 -->
             <div class="filter-group">
                 <label>제품코드:</label>
-                <select id="productFilter">
+                <select id="productCodeFilter">
                     <option value="all">전체</option>
-                    <!-- Product ref에서 동적으로 로드됨 -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>CP/NCP:</label>
+                <select id="cpncpFilter">
+                    <option value="all">전체</option>
                 </select>
             </div>
             <div class="filter-group">
                 <label>카테고리:</label>
                 <select id="categoryFilter">
                     <option value="all">전체</option>
-                    <!-- Product ref에서 동적으로 로드됨 -->
                 </select>
             </div>
+            <div class="filter-group">
+                <label>브랜드:</label>
+                <select id="brandFilter">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>맛:</label>
+                <select id="tasteFilter">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>패키지:</label>
+                <select id="packageFilter">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>비고:</label>
+                <select id="noteFilter">
+                    <option value="all">전체</option>
+                </select>
+            </div>
+
+            <!-- 검색 및 초기화 -->
             <div class="filter-group">
                 <label>검색:</label>
                 <input type="text" id="searchInput" placeholder="거래처명 또는 제품코드 검색...">
