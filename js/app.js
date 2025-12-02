@@ -194,6 +194,17 @@ async function loadAllData() {
             productData = productResult.data;
         }
 
+        // 디버깅: 제품코드 매칭 확인
+        console.log('=== 데이터 로딩 완료 ===');
+        console.log('판매 데이터 샘플 (첫 3개):', salesData.slice(0, 3).map(s => ({
+            제품코드: s['제품코드'],
+            제품코드타입: typeof s['제품코드']
+        })));
+        console.log('Product ref 샘플 (첫 5개):', productData.slice(0, 5).map(p => ({
+            제품코드: p['제품코드'],
+            제품코드타입: typeof p['제품코드']
+        })));
+
         // UI 업데이트
         populateFilters();
         updateSummaryCards();
@@ -444,12 +455,20 @@ function renderTable() {
     const pageData = sorted.slice(start, end);
 
     // 테이블 행 생성
-    pageData.forEach(item => {
+    pageData.forEach((item, index) => {
         // 거래처 정보 가져오기
         const client = clientData.find(c => c['거래처코드'] === item['거래처코드']) || {};
 
         // 제품 정보 가져오기
         const product = productData.find(p => p['제품코드'] === item['제품코드']) || {};
+
+        // 디버깅: 첫 번째 행만 로그
+        if (index === 0) {
+            console.log('=== 테이블 렌더링 디버깅 ===');
+            console.log('판매 데이터 제품코드:', item['제품코드'], typeof item['제품코드']);
+            console.log('매칭된 제품 정보:', product);
+            console.log('Product ref 전체 제품코드들:', productData.map(p => p['제품코드']).slice(0, 10));
+        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
