@@ -98,6 +98,10 @@
                 <span class="tab-icon">📈</span>
                 <span class="tab-label">차트</span>
             </button>
+            <button class="tab-btn" data-tab="report">
+                <span class="tab-icon">📄</span>
+                <span class="tab-label">보고서</span>
+            </button>
         </div>
 
         <div class="filters">
@@ -204,6 +208,25 @@
                     <div class="chart-box">
                         <h3>거래처별 판매 TOP 10</h3>
                         <div id="clientChart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 보고서 뷰 -->
+        <div id="reportView" class="tab-content">
+            <div class="report-section">
+                <div class="report-header">
+                    <h2>📄 판매 보고서</h2>
+                    <div class="report-controls">
+                        <button id="exportReportBtn" class="export-btn">내보내기 (PDF)</button>
+                    </div>
+                </div>
+                <div class="report-container">
+                    <div class="report-content">
+                        <p style="text-align: center; color: var(--secondary-color); padding: 40px;">
+                            보고서 양식이 곧 추가됩니다...
+                        </p>
                     </div>
                 </div>
             </div>

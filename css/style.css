@@ -561,6 +561,64 @@ tbody td {
     }
 }
 
+/* 보고서 섹션 */
+.report-section {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.report-header h2 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.report-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.export-btn {
+    padding: 10px 20px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.export-btn:hover {
+    background: #4a6275;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(95, 125, 149, 0.3);
+}
+
+.report-container {
+    background: var(--bg-color);
+    padding: 30px;
+    border-radius: 8px;
+    min-height: 600px;
+}
+
+.report-content {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
 /* 로딩 애니메이션 */
 .loading {
     display: inline-block;
