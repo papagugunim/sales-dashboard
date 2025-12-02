@@ -107,12 +107,18 @@ function handleLogin(username, password) {
 // 헬퍼: 앞자리 0 제거
 // ============================================
 function removeLeadingZeros(value) {
-  if (!value) return '';
+  if (!value && value !== 0) return '';
 
-  // 숫자로 변환 가능하면 숫자로 변환 후 문자열로 (앞자리 0 자동 제거)
-  const str = String(value).trim();
+  // 문자열로 변환 후 공백 제거
+  let str = String(value).trim();
+
+  // 빈 문자열이면 반환
+  if (str === '') return '';
+
+  // 숫자로만 구성되어 있으면 숫자로 변환 후 다시 문자열로 (앞자리 0 자동 제거)
   if (/^\d+$/.test(str)) {
-    return String(Number(str));
+    const num = Number(str);
+    return String(num);
   }
 
   // 숫자가 아니면 원본 반환
@@ -251,7 +257,7 @@ function getClientList() {
       if (!data[i][0]) continue;
 
       result.push({
-        '거래처코드': data[i][0] || '',           // A열: 거래처코드
+        '거래처코드': String(data[i][0] || ''),   // A열: 거래처코드 (문자열 변환)
         '거래처명(러시아어)': data[i][1] || '',    // B열: 거래처명(러시아어)
         '거래처명(한국어)': data[i][2] || '',      // C열: 거래처명(한국어)
         '내수수출구분': data[i][3] || '',          // D열: 내수/수출 구분
@@ -285,14 +291,14 @@ function getProductList() {
       if (!data[i][0]) continue;
 
       result.push({
-        '제품코드': data[i][0] || '',  // A열: 제품코드
-        'CP/NCP': data[i][1],
-        '판매지': data[i][2],
-        '대분류': data[i][3],
-        '지역': data[i][4],
-        '맛': data[i][5],
-        '패키지': data[i][6],
-        '비고': data[i][7]
+        '제품코드': String(data[i][0] || ''),  // A열: 제품코드 (문자열 변환)
+        'CP/NCP': data[i][1] || '',
+        '판매지': data[i][2] || '',
+        '대분류': data[i][3] || '',
+        '지역': data[i][4] || '',
+        '맛': data[i][5] || '',
+        '패키지': data[i][6] || '',
+        '비고': data[i][7] || ''
       });
     }
 
