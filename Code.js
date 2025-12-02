@@ -156,16 +156,25 @@ function getSalesDataFromDrive() {
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
 
-    // 빈 행 건너뛰기
-    if (!row[0] && !row[1]) continue;
+    // 빈 행 또는 유효하지 않은 데이터 건너뛰기
+    // 날짜, 거래처코드, 제품코드 중 하나라도 없으면 스킵
+    if (!row[0] || !row[1] || !row[5]) continue;
+
+    // 날짜가 유효하지 않으면 스킵
+    const dateStr = formatDate(row[0]);
+    if (!dateStr || dateStr.includes('NaN')) continue;
+
+    // 금액이 비정상적으로 크면 스킵 (100억 이상)
+    const amount = parseFloat(row[11]) || 0;
+    if (amount > 10000000000) continue;
 
     const salesData = {
-      '날짜': formatDate(row[0]), // A열: 판매날짜
+      '날짜': dateStr, // A열: 판매날짜
       '거래처코드': row[1] || '', // B열: 거래처코드
       '거래처명': row[3] || '', // D열: 거래처명(러시아어)
       '제품코드': row[5] || '', // F열: 제품코드
       '수량': parseFloat(row[8]) || 0, // I열: 수량(박스)
-      '금액': parseFloat(row[11]) || 0, // L열: 금액(부가세제외)
+      '금액': Math.round(amount), // L열: 금액(부가세제외) - 정수로 반올림
       '주문번호': row[13] || '', // N열: 주문번호
       '할인율': parseFloat(row[14]) || 0 // O열: 할인율
     };
