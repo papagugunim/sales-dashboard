@@ -2,8 +2,8 @@
 // 판매관리 대시보드 - JavaScript
 // ============================================
 
-// API 설정 (최신 @HEAD 버전 사용)
-const API_URL = 'https://script.google.com/macros/s/AKfycbyvnlXrPlSWxCOQhJVSg_qfAOO8YHtqkUhdxHrYnBi4/exec';
+// API 설정 (@8 버전: 제품코드 로딩 완전 수정)
+const API_URL = 'https://script.google.com/macros/s/AKfycbzbeulFxhIwmNhF7cwm0pun4KMEH_8ySJ3QRERTTx9WyGv4Lmhj3b9IK_rHQ29ILlOUAQ/exec';
 const API_TOKEN = 'lotte-sales-2024';
 
 // 전역 변수
@@ -194,15 +194,12 @@ async function loadAllData() {
             productData = productResult.data;
         }
 
-        // 디버깅: 제품코드 매칭 확인
-        console.log('=== 데이터 로딩 완료 ===');
-        console.log('판매 데이터 총 개수:', salesData.length);
-        console.log('거래처 DB 총 개수:', clientData.length);
-        console.log('Product ref 총 개수:', productData.length);
-        console.log('');
-        console.log('판매 데이터 제품코드 샘플 (첫 10개):', salesData.slice(0, 10).map(s => s['제품코드']));
-        console.log('Product ref 제품코드 샘플 (첫 20개):', productData.slice(0, 20).map(p => p['제품코드']));
-        console.log('');
+        // 데이터 로딩 완료
+        console.log('✓ 데이터 로딩 완료:', {
+            판매: salesData.length,
+            거래처: clientData.length,
+            제품: productData.length
+        });
 
         // UI 업데이트
         populateFilters();
@@ -460,21 +457,6 @@ function renderTable() {
 
         // 제품 정보 가져오기 (문자열 비교)
         const product = productData.find(p => String(p['제품코드']) === String(item['제품코드'])) || {};
-
-        // 디버깅: 처음 3개 행 로그
-        if (index < 3) {
-            console.log(`--- 행 ${index + 1} ---`);
-            console.log('판매 데이터 제품코드:', item['제품코드']);
-            console.log('매칭 시도:', `String(${product['제품코드']}) === String(${item['제품코드']})`);
-            console.log('매칭 결과:', product['제품코드'] ? '성공 ✓' : '실패 ✗');
-            if (product['제품코드']) {
-                console.log('제품 정보:', {
-                    '제품코드': product['제품코드'],
-                    'CP/NCP': product['CP/NCP'],
-                    '카테고리': product['대분류']
-                });
-            }
-        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `

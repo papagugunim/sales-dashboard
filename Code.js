@@ -24,6 +24,22 @@ function doGet(e) {
   }
 
   try {
+    // 테스트 액션 (디버깅용)
+    if (action === 'testProducts') {
+      const products = getProductList();
+      const summary = {
+        총개수: products.length,
+        첫10개: products.slice(0, 10).map(p => ({
+          제품코드: p['제품코드'],
+          타입: typeof p['제품코드'],
+          'CP/NCP': p['CP/NCP'],
+          카테고리: p['대분류']
+        })),
+        제품코드목록: products.map(p => p['제품코드'])
+      };
+      return createResponse('success', 'Product ref 테스트', summary);
+    }
+
     // 로그인
     if (action === 'login') {
       const username = e.parameter.username;
@@ -322,4 +338,42 @@ function testGetSalesData() {
   Logger.log('File name: ' + result.fileName);
   Logger.log('First 5 records:');
   Logger.log(JSON.stringify(result.data.slice(0, 5), null, 2));
+}
+
+function testGetProductList() {
+  const products = getProductList();
+  Logger.log('=== Product ref 테스트 ===');
+  Logger.log('총 제품 개수: ' + products.length);
+  Logger.log('첫 10개 제품:');
+  products.slice(0, 10).forEach((p, i) => {
+    Logger.log(`${i + 1}. 제품코드: "${p['제품코드']}" (타입: ${typeof p['제품코드']}), CP/NCP: "${p['CP/NCP']}", 카테고리: "${p['대분류']}"`);
+  });
+  Logger.log('마지막 5개 제품:');
+  products.slice(-5).forEach((p, i) => {
+    Logger.log(`${products.length - 4 + i}. 제품코드: "${p['제품코드']}" (타입: ${typeof p['제품코드']}), CP/NCP: "${p['CP/NCP']}", 카테고리: "${p['대분류']}"`);
+  });
+}
+
+function testProductMatching() {
+  const salesData = getSalesDataFromDrive();
+  const products = getProductList();
+
+  Logger.log('=== 매칭 테스트 ===');
+  Logger.log('판매 데이터 개수: ' + salesData.totalRecords);
+  Logger.log('제품 데이터 개수: ' + products.length);
+  Logger.log('');
+
+  // 첫 5개 판매 데이터의 제품코드로 매칭 테스트
+  salesData.data.slice(0, 5).forEach((sale, i) => {
+    const saleCode = sale['제품코드'];
+    const matchedProduct = products.find(p => p['제품코드'] === saleCode);
+
+    Logger.log(`${i + 1}. 판매 제품코드: "${saleCode}"`);
+    if (matchedProduct) {
+      Logger.log(`   ✓ 매칭 성공! CP/NCP: ${matchedProduct['CP/NCP']}, 카테고리: ${matchedProduct['대분류']}`);
+    } else {
+      Logger.log(`   ✗ 매칭 실패! Product ref에 없음`);
+      Logger.log(`   Product ref의 제품코드들 (샘플): ${products.slice(0, 10).map(p => p['제품코드']).join(', ')}`);
+    }
+  });
 }
