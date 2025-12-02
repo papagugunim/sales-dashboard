@@ -2,6 +2,12 @@
 
 롯데제과 러시아법인의 판매 데이터를 분석하고 관리하는 웹 기반 대시보드 시스템입니다.
 
+## 🌐 접속 방법
+
+**GitHub Pages**: https://papagugunim.github.io/sales-dashboard/
+
+로컬 파일로도 사용 가능합니다.
+
 ## 주요 기능
 
 ### 📊 판매 현황 분석
