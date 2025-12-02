@@ -254,10 +254,12 @@ function getClientList() {
 
     const result = [];
     for (let i = 1; i < data.length; i++) {
-      if (!data[i][0]) continue;
+      // 거래처코드 확인 (0도 유효한 값으로 처리)
+      const clientCode = String(data[i][0] || '').trim();
+      if (!clientCode) continue;  // 빈 문자열만 건너뛰기
 
       result.push({
-        '거래처코드': String(data[i][0] || ''),   // A열: 거래처코드 (문자열 변환)
+        '거래처코드': clientCode,                 // A열: 거래처코드 (문자열, 공백 제거)
         '거래처명(러시아어)': data[i][1] || '',    // B열: 거래처명(러시아어)
         '거래처명(한국어)': data[i][2] || '',      // C열: 거래처명(한국어)
         '내수수출구분': data[i][3] || '',          // D열: 내수/수출 구분
@@ -288,10 +290,12 @@ function getProductList() {
 
     const result = [];
     for (let i = 1; i < data.length; i++) {
-      if (!data[i][0]) continue;
+      // 제품코드 확인 (0도 유효한 값으로 처리)
+      const productCode = String(data[i][0] || '').trim();
+      if (!productCode) continue;  // 빈 문자열만 건너뛰기
 
       result.push({
-        '제품코드': String(data[i][0] || ''),  // A열: 제품코드 (문자열 변환)
+        '제품코드': productCode,  // A열: 제품코드 (문자열, 공백 제거)
         'CP/NCP': data[i][1] || '',
         '판매지': data[i][2] || '',
         '대분류': data[i][3] || '',
