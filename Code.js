@@ -135,15 +135,12 @@ function getSalesDataFromDrive() {
 
   // Excel 파일을 임시 스프레드시트로 변환
   const blob = latestFile.getBlob();
-  const tempFile = {
-    title: 'temp_sales_data',
-    mimeType: MimeType.GOOGLE_SHEETS
-  };
 
-  // 파일을 Google Sheets로 변환
-  const spreadsheet = Drive.Files.insert(tempFile, blob, {
-    convert: true
-  });
+  // 파일을 Google Sheets로 변환 (Drive API v3)
+  const spreadsheet = Drive.Files.create({
+    name: 'temp_sales_data',
+    mimeType: 'application/vnd.google-apps.spreadsheet'
+  }, blob);
 
   // 데이터 읽기
   const sheet = SpreadsheetApp.openById(spreadsheet.id).getSheets()[0];
