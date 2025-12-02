@@ -104,6 +104,22 @@ function handleLogin(username, password) {
 }
 
 // ============================================
+// 헬퍼: 앞자리 0 제거
+// ============================================
+function removeLeadingZeros(value) {
+  if (!value) return '';
+
+  // 숫자로 변환 가능하면 숫자로 변환 후 문자열로 (앞자리 0 자동 제거)
+  const str = String(value).trim();
+  if (/^\d+$/.test(str)) {
+    return String(Number(str));
+  }
+
+  // 숫자가 아니면 원본 반환
+  return str;
+}
+
+// ============================================
 // 판매 데이터 로드 (Google Drive)
 // ============================================
 function getSalesDataFromDrive() {
@@ -170,9 +186,9 @@ function getSalesDataFromDrive() {
 
     const salesData = {
       '날짜': dateStr, // A열: 판매날짜
-      '거래처코드': String(row[1] || ''), // B열: 거래처코드 (문자열로 변환하여 앞자리 0 유지)
+      '거래처코드': removeLeadingZeros(row[1]), // B열: 거래처코드 (앞자리 0 제거하여 거래처DB와 매칭)
       '거래처명': row[3] || '', // D열: 거래처명(러시아어)
-      '제품코드': String(row[5] || ''), // F열: 제품코드 (문자열로 변환하여 앞자리 0 유지)
+      '제품코드': removeLeadingZeros(row[5]), // F열: 제품코드 (앞자리 0 제거하여 Product ref와 매칭)
       '수량': parseFloat(row[8]) || 0, // I열: 수량(박스)
       '금액': Math.round(amount), // L열: 금액(부가세제외) - 정수로 반올림
       '주문번호': row[13] || '', // N열: 주문번호
@@ -235,7 +251,7 @@ function getClientList() {
       if (!data[i][0]) continue;
 
       result.push({
-        '거래처코드': String(data[i][0] || ''),   // A열: 거래처코드 (문자열로 변환하여 앞자리 0 유지)
+        '거래처코드': data[i][0] || '',           // A열: 거래처코드
         '거래처명(러시아어)': data[i][1] || '',    // B열: 거래처명(러시아어)
         '거래처명(한국어)': data[i][2] || '',      // C열: 거래처명(한국어)
         '내수수출구분': data[i][3] || '',          // D열: 내수/수출 구분
@@ -269,7 +285,7 @@ function getProductList() {
       if (!data[i][0]) continue;
 
       result.push({
-        '제품코드': String(data[i][0] || ''),  // A열: 제품코드 (문자열로 변환하여 앞자리 0 유지)
+        '제품코드': data[i][0] || '',  // A열: 제품코드
         'CP/NCP': data[i][1],
         '판매지': data[i][2],
         '대분류': data[i][3],
