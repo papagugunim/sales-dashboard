@@ -85,11 +85,13 @@ function handleLogin(username, password) {
     const data = sheet.getDataRange().getValues();
 
     // 헤더 제외하고 검색
+    // Admin 시트 구조: A열(타입), B열(username), C열(password), D열(name)
     for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === username && data[i][1] === password) {
+      // 타입이 'USER'인 행만 확인
+      if (data[i][0] === 'USER' && data[i][1] === username && data[i][2] === password) {
         return createResponse('success', '로그인 성공', {
-          username: data[i][0],
-          name: data[i][2] || username
+          username: data[i][1],
+          name: data[i][3] || username
         });
       }
     }
