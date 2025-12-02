@@ -313,22 +313,22 @@ function applyFilters() {
             if (itemMonth !== filters.month) return false;
         }
 
-        // 거래처 정보 가져오기
-        const client = clientData.find(c => c['거래처코드'] === item['거래처코드']);
+        // 거래처 정보 가져오기 (문자열 비교)
+        const client = clientData.find(c => String(c['거래처코드']) === String(item['거래처코드']));
 
         // 거래처 관련 필터
-        if (filters.clientCode !== 'all' && item['거래처코드'] !== filters.clientCode) return false;
+        if (filters.clientCode !== 'all' && String(item['거래처코드']) !== filters.clientCode) return false;
         if (filters.clientName !== 'all' && (!client || client['거래처명(러시아어)'] !== filters.clientName)) return false;
         if (filters.domesticExport !== 'all' && (!client || client['내수수출구분'] !== filters.domesticExport)) return false;
         if (filters.country !== 'all' && (!client || client['나라'] !== filters.country)) return false;
         if (filters.regionExport !== 'all' && (!client || client['지역'] !== filters.regionExport)) return false;
         if (filters.dealerChain !== 'all' && (!client || client['대리점연방체인구분'] !== filters.dealerChain)) return false;
 
-        // 제품 정보 가져오기
-        const product = productData.find(p => p['제품코드'] === item['제품코드']);
+        // 제품 정보 가져오기 (문자열 비교)
+        const product = productData.find(p => String(p['제품코드']) === String(item['제품코드']));
 
         // 제품 관련 필터
-        if (filters.productCode !== 'all' && item['제품코드'] !== filters.productCode) return false;
+        if (filters.productCode !== 'all' && String(item['제품코드']) !== filters.productCode) return false;
         if (filters.cpncp !== 'all' && (!product || product['CP/NCP'] !== filters.cpncp)) return false;
         if (filters.category !== 'all' && (!product || product['대분류'] !== filters.category)) return false;
         if (filters.brand !== 'all' && (!product || product['지역'] !== filters.brand)) return false;
@@ -424,15 +424,15 @@ function renderTable() {
             aVal = a[getColumnKey(sortColumn)];
             bVal = b[getColumnKey(sortColumn)];
         } else if (columnType === 'client') {
-            // 거래처 데이터에서 가져오기
-            const aClient = clientData.find(c => c['거래처코드'] === a['거래처코드']) || {};
-            const bClient = clientData.find(c => c['거래처코드'] === b['거래처코드']) || {};
+            // 거래처 데이터에서 가져오기 (문자열 비교)
+            const aClient = clientData.find(c => String(c['거래처코드']) === String(a['거래처코드'])) || {};
+            const bClient = clientData.find(c => String(c['거래처코드']) === String(b['거래처코드'])) || {};
             aVal = aClient[getColumnKey(sortColumn)];
             bVal = bClient[getColumnKey(sortColumn)];
         } else if (columnType === 'product') {
-            // 제품 데이터에서 가져오기
-            const aProduct = productData.find(p => p['제품코드'] === a['제품코드']) || {};
-            const bProduct = productData.find(p => p['제품코드'] === b['제품코드']) || {};
+            // 제품 데이터에서 가져오기 (문자열 비교)
+            const aProduct = productData.find(p => String(p['제품코드']) === String(a['제품코드'])) || {};
+            const bProduct = productData.find(p => String(p['제품코드']) === String(b['제품코드'])) || {};
             aVal = aProduct[getColumnKey(sortColumn)];
             bVal = bProduct[getColumnKey(sortColumn)];
         }
@@ -456,11 +456,11 @@ function renderTable() {
 
     // 테이블 행 생성
     pageData.forEach((item, index) => {
-        // 거래처 정보 가져오기
-        const client = clientData.find(c => c['거래처코드'] === item['거래처코드']) || {};
+        // 거래처 정보 가져오기 (문자열 비교)
+        const client = clientData.find(c => String(c['거래처코드']) === String(item['거래처코드'])) || {};
 
-        // 제품 정보 가져오기
-        const product = productData.find(p => p['제품코드'] === item['제품코드']) || {};
+        // 제품 정보 가져오기 (문자열 비교)
+        const product = productData.find(p => String(p['제품코드']) === String(item['제품코드'])) || {};
 
         // 디버깅: 첫 번째 행만 로그
         if (index === 0) {
@@ -698,7 +698,7 @@ function renderRegionChart() {
     // 지역별 집계
     const regionData = {};
     filteredData.forEach(item => {
-        const client = clientData.find(c => c['거래처코드'] === item['거래처코드']);
+        const client = clientData.find(c => String(c['거래처코드']) === String(item['거래처코드']));
         const region = client ? client['지역'] : '기타';
 
         if (!regionData[region]) {
