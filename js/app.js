@@ -1161,6 +1161,93 @@ function makeEditable(td) {
 }
 
 function exportYoyToExcel() {
-    alert('Excel 내보내기 기능은 곧 추가됩니다.');
-    // TODO: CSV 또는 Excel 내보내기 구현
+    // YoY 테이블 데이터 확인
+    const tbody = document.getElementById('yoyTableBody');
+    const rows = tbody.querySelectorAll('tr');
+
+    if (rows.length === 0 || rows[0].cells.length === 1) {
+        alert('먼저 "보고서 갱신" 버튼을 클릭하여 보고서를 생성하세요.');
+        return;
+    }
+
+    // 비교 기간 가져오기
+    const periodEnd = document.getElementById('yoyPeriodStart').value;
+
+    // Excel 데이터 배열 생성
+    const data = [];
+
+    // 헤더 추가
+    data.push([
+        '국가',
+        '거래처',
+        '25년 목표\n(백만 루블)',
+        `1-${periodEnd}월 누적 24년\n(백만 루블)`,
+        `1-${periodEnd}월 누적 25년\n(백만 루블)`,
+        '증감 (%)',
+        '12월 24년\n(백만 루블)',
+        '12월 25년\n(백만 루블)',
+        '목표달성\n(%)',
+        '잔여매출\n(백만 루블)',
+        '오더확정액\n(백만 루블)',
+        '비고'
+    ]);
+
+    // 데이터 행 추가
+    rows.forEach(row => {
+        if (row.cells.length === 12) {
+            const rowData = [];
+            for (let i = 0; i < row.cells.length; i++) {
+                let cellText = row.cells[i].textContent.trim();
+
+                // "+" 제거 및 숫자 변환
+                if (cellText.includes('%')) {
+                    cellText = cellText.replace('+', '');
+                } else if (cellText !== '-' && i >= 2 && i <= 10) {
+                    // 숫자 셀인 경우 "-"가 아니면 숫자로 변환
+                    const num = parseFloat(cellText);
+                    if (!isNaN(num)) {
+                        cellText = num;
+                    }
+                }
+
+                rowData.push(cellText === '-' ? '' : cellText);
+            }
+            data.push(rowData);
+        }
+    });
+
+    // SheetJS 워크북 생성
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // 열 너비 설정
+    ws['!cols'] = [
+        { wch: 12 },  // 국가
+        { wch: 25 },  // 거래처
+        { wch: 12 },  // 25년 목표
+        { wch: 12 },  // 1-N월 24년
+        { wch: 12 },  // 1-N월 25년
+        { wch: 12 },  // 증감
+        { wch: 12 },  // 12월 24년
+        { wch: 12 },  // 12월 25년
+        { wch: 12 },  // 목표달성
+        { wch: 12 },  // 잔여매출
+        { wch: 12 },  // 오더확정액
+        { wch: 20 }   // 비고
+    ];
+
+    // 워크북 생성
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'YoY 비교');
+
+    // 파일명 생성 (현재 날짜 포함)
+    const today = new Date();
+    const dateStr = today.getFullYear() +
+                    String(today.getMonth() + 1).padStart(2, '0') +
+                    String(today.getDate()).padStart(2, '0');
+    const filename = `국가별_거래처별_YoY비교보고서_${dateStr}.xlsx`;
+
+    // Excel 파일 다운로드
+    XLSX.writeFile(wb, filename);
+
+    console.log(`Excel 파일 내보내기 완료: ${filename}`);
 }
