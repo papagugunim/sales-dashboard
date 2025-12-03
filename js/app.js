@@ -1015,7 +1015,7 @@ function renderYoyTable(yoyData, periodEnd) {
     const thead = document.querySelector('#yoyTable thead');
     const periodHeader = thead.querySelector('th[colspan="3"]');
     if (periodHeader) {
-        periodHeader.textContent = `1-${periodEnd}월 누적 (백만 루블)`;
+        periodHeader.textContent = `1-${periodEnd}월 누적 (루블)`;
     }
 
     let html = '';
@@ -1039,11 +1039,11 @@ function renderYoyTable(yoyData, periodEnd) {
                     <tr class="country-row">
                         <td colspan="2"><strong>${currentCountry} 소계</strong></td>
                         <td>-</td>
-                        <td><strong>${(countryTotal2024Cum / 1000000).toFixed(1)}</strong></td>
-                        <td><strong>${(countryTotal2025Cum / 1000000).toFixed(1)}</strong></td>
+                        <td><strong>${formatNumber(Math.round(countryTotal2024Cum))}</strong></td>
+                        <td><strong>${formatNumber(Math.round(countryTotal2025Cum))}</strong></td>
                         <td class="${changeClass}"><strong>${change >= 0 ? '+' : ''}${change.toFixed(1)}%</strong></td>
-                        <td><strong>${(countryTotal2024Dec / 1000000).toFixed(1)}</strong></td>
-                        <td><strong>${(countryTotal2025Dec / 1000000).toFixed(1)}</strong></td>
+                        <td><strong>${formatNumber(Math.round(countryTotal2024Dec))}</strong></td>
+                        <td><strong>${formatNumber(Math.round(countryTotal2025Dec))}</strong></td>
                         <td colspan="4">-</td>
                     </tr>
                 `;
@@ -1057,11 +1057,11 @@ function renderYoyTable(yoyData, periodEnd) {
             currentCountry = row.country;
         }
 
-        // 백만 루블로 변환
-        const amount2024Cum = row.amount2024_cumulative / 1000000;
-        const amount2025Cum = row.amount2025_cumulative / 1000000;
-        const amount2024Dec = row.amount2024_dec / 1000000;
-        const amount2025Dec = row.amount2025_dec / 1000000;
+        // 루블 단위 (백만으로 나누지 않음)
+        const amount2024Cum = row.amount2024_cumulative;
+        const amount2025Cum = row.amount2025_cumulative;
+        const amount2024Dec = row.amount2024_dec;
+        const amount2025Dec = row.amount2025_dec;
 
         // 증감율 계산
         const change = amount2024Cum > 0
@@ -1084,15 +1084,15 @@ function renderYoyTable(yoyData, periodEnd) {
             <tr>
                 <td>${row.country}</td>
                 <td>${row.clientNameKr || row.clientNameRu}</td>
-                <td class="editable" data-field="target" data-key="${index}">${target > 0 ? target.toFixed(1) : '-'}</td>
-                <td>${amount2024Cum.toFixed(1)}</td>
-                <td>${amount2025Cum.toFixed(1)}</td>
+                <td class="editable" data-field="target" data-key="${index}">${target > 0 ? formatNumber(Math.round(target)) : '-'}</td>
+                <td>${formatNumber(Math.round(amount2024Cum))}</td>
+                <td>${formatNumber(Math.round(amount2025Cum))}</td>
                 <td class="${changeClass}">${change >= 0 ? '+' : ''}${change.toFixed(1)}%</td>
-                <td>${amount2024Dec > 0 ? amount2024Dec.toFixed(1) : '-'}</td>
-                <td>${amount2025Dec > 0 ? amount2025Dec.toFixed(1) : '-'}</td>
+                <td>${amount2024Dec > 0 ? formatNumber(Math.round(amount2024Dec)) : '-'}</td>
+                <td>${amount2025Dec > 0 ? formatNumber(Math.round(amount2025Dec)) : '-'}</td>
                 <td>${achievement > 0 ? achievement.toFixed(1) + '%' : '-'}</td>
-                <td>${remaining > 0 ? remaining.toFixed(1) : '-'}</td>
-                <td class="editable" data-field="order" data-key="${index}">${row.orderConfirmed > 0 ? row.orderConfirmed.toFixed(1) : '-'}</td>
+                <td>${remaining > 0 ? formatNumber(Math.round(remaining)) : '-'}</td>
+                <td class="editable" data-field="order" data-key="${index}">${row.orderConfirmed > 0 ? formatNumber(Math.round(row.orderConfirmed)) : '-'}</td>
                 <td class="editable" data-field="note" data-key="${index}">${row.note || ''}</td>
             </tr>
         `;
@@ -1108,11 +1108,11 @@ function renderYoyTable(yoyData, periodEnd) {
                 <tr class="country-row">
                     <td colspan="2"><strong>${currentCountry} 소계</strong></td>
                     <td>-</td>
-                    <td><strong>${(countryTotal2024Cum / 1000000).toFixed(1)}</strong></td>
-                    <td><strong>${(countryTotal2025Cum / 1000000).toFixed(1)}</strong></td>
+                    <td><strong>${formatNumber(Math.round(countryTotal2024Cum))}</strong></td>
+                    <td><strong>${formatNumber(Math.round(countryTotal2025Cum))}</strong></td>
                     <td class="${changeClass}"><strong>${change >= 0 ? '+' : ''}${change.toFixed(1)}%</strong></td>
-                    <td><strong>${(countryTotal2024Dec / 1000000).toFixed(1)}</strong></td>
-                    <td><strong>${(countryTotal2025Dec / 1000000).toFixed(1)}</strong></td>
+                    <td><strong>${formatNumber(Math.round(countryTotal2024Dec))}</strong></td>
+                    <td><strong>${formatNumber(Math.round(countryTotal2025Dec))}</strong></td>
                     <td colspan="4">-</td>
                 </tr>
             `;
@@ -1183,15 +1183,15 @@ function exportYoyToExcel() {
     data.push([
         '국가',
         '거래처',
-        '25년 목표\n(백만 루블)',
-        `1-${periodEnd}월 누적 24년\n(백만 루블)`,
-        `1-${periodEnd}월 누적 25년\n(백만 루블)`,
+        '25년 목표\n(루블)',
+        `1-${periodEnd}월 누적 24년\n(루블)`,
+        `1-${periodEnd}월 누적 25년\n(루블)`,
         '증감 (%)',
-        '12월 24년\n(백만 루블)',
-        '12월 25년\n(백만 루블)',
+        '12월 24년\n(루블)',
+        '12월 25년\n(루블)',
         '목표달성\n(%)',
-        '잔여매출\n(백만 루블)',
-        '오더확정액\n(백만 루블)',
+        '잔여매출\n(루블)',
+        '오더확정액\n(루블)',
         '비고'
     ]);
 
