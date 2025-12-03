@@ -909,17 +909,19 @@ function calculateYoyData(data2024, data2025, periodEnd) {
 
         // 거래처 정보 가져오기
         const client = clientData.find(c => String(c['거래처코드']) === clientCode);
-        if (!client) return;
 
-        const country = client['나라'] || '기타';
-        const clientNameRu = client['거래처명(러시아어)'] || item['거래처명'] || '알 수 없음';
-        const clientNameKr = client['거래처명(한국어)'] || '';
+        // 거래처 매칭 여부에 따라 다르게 처리
+        const country = client ? (client['나라'] || '기타') : '기타';
+        const region = client ? (client['지역'] || `기타(${clientCode})`) : `기타(${clientCode})`;
+        const clientNameRu = client ? (client['거래처명(러시아어)'] || item['거래처명'] || '알 수 없음') : item['거래처명'] || '알 수 없음';
+        const clientNameKr = client ? (client['거래처명(한국어)'] || '') : '';
 
-        const key = `${country}|||${clientCode}|||${clientNameRu}|||${clientNameKr}`;
+        const key = `${country}|||${region}|||${clientCode}`;
 
         if (!result[key]) {
             result[key] = {
                 country,
+                region,
                 clientCode,
                 clientNameRu,
                 clientNameKr,
@@ -953,17 +955,19 @@ function calculateYoyData(data2024, data2025, periodEnd) {
 
         // 거래처 정보 가져오기
         const client = clientData.find(c => String(c['거래처코드']) === clientCode);
-        if (!client) return;
 
-        const country = client['나라'] || '기타';
-        const clientNameRu = client['거래처명(러시아어)'] || item['거래처명'] || '알 수 없음';
-        const clientNameKr = client['거래처명(한국어)'] || '';
+        // 거래처 매칭 여부에 따라 다르게 처리
+        const country = client ? (client['나라'] || '기타') : '기타';
+        const region = client ? (client['지역'] || `기타(${clientCode})`) : `기타(${clientCode})`;
+        const clientNameRu = client ? (client['거래처명(러시아어)'] || item['거래처명'] || '알 수 없음') : item['거래처명'] || '알 수 없음';
+        const clientNameKr = client ? (client['거래처명(한국어)'] || '') : '';
 
-        const key = `${country}|||${clientCode}|||${clientNameRu}|||${clientNameKr}`;
+        const key = `${country}|||${region}|||${clientCode}`;
 
         if (!result[key]) {
             result[key] = {
                 country,
+                region,
                 clientCode,
                 clientNameRu,
                 clientNameKr,
@@ -1083,7 +1087,7 @@ function renderYoyTable(yoyData, periodEnd) {
         html += `
             <tr>
                 <td>${row.country}</td>
-                <td>${row.clientNameKr || row.clientNameRu}</td>
+                <td>${row.region}</td>
                 <td class="editable" data-field="target" data-key="${index}">${target > 0 ? formatNumber(Math.round(target)) : '-'}</td>
                 <td>${formatNumber(Math.round(amount2024Cum))}</td>
                 <td>${formatNumber(Math.round(amount2025Cum))}</td>
@@ -1182,7 +1186,7 @@ function exportYoyToExcel() {
     // 헤더 추가
     data.push([
         '국가',
-        '거래처',
+        '지역',
         '25년 목표\n(루블)',
         `1-${periodEnd}월 누적 24년\n(루블)`,
         `1-${periodEnd}월 누적 25년\n(루블)`,
