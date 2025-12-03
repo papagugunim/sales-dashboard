@@ -99,6 +99,10 @@ function setupEventListeners() {
             handleSort(this.dataset.column);
         });
     });
+
+    // YoY 보고서
+    document.getElementById('updateYoyReportBtn').addEventListener('click', generateYoyReport);
+    document.getElementById('exportYoyBtn').addEventListener('click', exportYoyToExcel);
 }
 
 // ============================================
@@ -858,4 +862,305 @@ function toggleDarkMode() {
 // ============================================
 function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// ============================================
+// YoY 보고서 함수
+// ============================================
+function generateYoyReport() {
+    const periodEnd = parseInt(document.getElementById('yoyPeriodStart').value);
+
+    // 2024년과 2025년 데이터 분리
+    const data2024 = salesData.filter(item => {
+        const year = item['날짜'] ? item['날짜'].substring(0, 4) : '';
+        return year === '2024';
+    });
+
+    const data2025 = salesData.filter(item => {
+        const year = item['날짜'] ? item['날짜'].substring(0, 4) : '';
+        return year === '2025';
+    });
+
+    console.log('YoY 데이터 분리:', {
+        '2024년': data2024.length,
+        '2025년': data2025.length,
+        '비교 기간': `1-${periodEnd}월`
+    });
+
+    // 국가별/거래처별 데이터 계산
+    const yoyData = calculateYoyData(data2024, data2025, periodEnd);
+
+    // 테이블 렌더링
+    renderYoyTable(yoyData, periodEnd);
+}
+
+function calculateYoyData(data2024, data2025, periodEnd) {
+    const result = {};
+
+    // 2024년 데이터 집계
+    data2024.forEach(item => {
+        const date = item['날짜'] || '';
+        const month = date.length >= 7 ? parseInt(date.substring(5, 7)) : 0;
+        const clientCode = String(item['거래처코드']);
+        const amount = parseFloat(item['금액']) || 0;
+
+        // 거래처 정보 가져오기
+        const client = clientData.find(c => String(c['거래처코드']) === clientCode);
+        if (!client) return;
+
+        const country = client['나라'] || '기타';
+        const clientNameRu = client['거래처명(러시아어)'] || item['거래처명'] || '알 수 없음';
+        const clientNameKr = client['거래처명(한국어)'] || '';
+
+        const key = `${country}|||${clientCode}|||${clientNameRu}|||${clientNameKr}`;
+
+        if (!result[key]) {
+            result[key] = {
+                country,
+                clientCode,
+                clientNameRu,
+                clientNameKr,
+                amount2024_cumulative: 0,
+                amount2024_dec: 0,
+                amount2025_cumulative: 0,
+                amount2025_dec: 0,
+                target2025: 0,
+                orderConfirmed: 0,
+                note: ''
+            };
+        }
+
+        // 1-N월 누적
+        if (month >= 1 && month <= periodEnd) {
+            result[key].amount2024_cumulative += amount;
+        }
+
+        // 12월
+        if (month === 12) {
+            result[key].amount2024_dec += amount;
+        }
+    });
+
+    // 2025년 데이터 집계
+    data2025.forEach(item => {
+        const date = item['날짜'] || '';
+        const month = date.length >= 7 ? parseInt(date.substring(5, 7)) : 0;
+        const clientCode = String(item['거래처코드']);
+        const amount = parseFloat(item['금액']) || 0;
+
+        // 거래처 정보 가져오기
+        const client = clientData.find(c => String(c['거래처코드']) === clientCode);
+        if (!client) return;
+
+        const country = client['나라'] || '기타';
+        const clientNameRu = client['거래처명(러시아어)'] || item['거래처명'] || '알 수 없음';
+        const clientNameKr = client['거래처명(한국어)'] || '';
+
+        const key = `${country}|||${clientCode}|||${clientNameRu}|||${clientNameKr}`;
+
+        if (!result[key]) {
+            result[key] = {
+                country,
+                clientCode,
+                clientNameRu,
+                clientNameKr,
+                amount2024_cumulative: 0,
+                amount2024_dec: 0,
+                amount2025_cumulative: 0,
+                amount2025_dec: 0,
+                target2025: 0,
+                orderConfirmed: 0,
+                note: ''
+            };
+        }
+
+        // 1-N월 누적
+        if (month >= 1 && month <= periodEnd) {
+            result[key].amount2025_cumulative += amount;
+        }
+
+        // 12월
+        if (month === 12) {
+            result[key].amount2025_dec += amount;
+        }
+    });
+
+    // 배열로 변환 및 국가별 정렬
+    return Object.values(result).sort((a, b) => {
+        if (a.country !== b.country) {
+            return a.country.localeCompare(b.country);
+        }
+        return b.amount2025_cumulative - a.amount2025_cumulative;
+    });
+}
+
+function renderYoyTable(yoyData, periodEnd) {
+    const tbody = document.getElementById('yoyTableBody');
+
+    if (yoyData.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="12" style="text-align: center; padding: 40px; color: var(--secondary-color);">
+                    해당 기간에 데이터가 없습니다
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    // 테이블 헤더 업데이트 (1-N월 표시)
+    const thead = document.querySelector('#yoyTable thead');
+    const periodHeader = thead.querySelector('th[colspan="3"]');
+    if (periodHeader) {
+        periodHeader.textContent = `1-${periodEnd}월 누적 (백만 루블)`;
+    }
+
+    let html = '';
+    let currentCountry = '';
+    let countryTotal2024Cum = 0;
+    let countryTotal2025Cum = 0;
+    let countryTotal2024Dec = 0;
+    let countryTotal2025Dec = 0;
+
+    yoyData.forEach((row, index) => {
+        // 국가가 바뀌면 국가 소계 행 추가
+        if (row.country !== currentCountry) {
+            if (currentCountry) {
+                // 이전 국가 소계
+                const change = countryTotal2024Cum > 0
+                    ? ((countryTotal2025Cum - countryTotal2024Cum) / countryTotal2024Cum * 100)
+                    : 0;
+                const changeClass = change >= 0 ? 'positive' : 'negative';
+
+                html += `
+                    <tr class="country-row">
+                        <td colspan="2"><strong>${currentCountry} 소계</strong></td>
+                        <td>-</td>
+                        <td><strong>${(countryTotal2024Cum / 1000000).toFixed(1)}</strong></td>
+                        <td><strong>${(countryTotal2025Cum / 1000000).toFixed(1)}</strong></td>
+                        <td class="${changeClass}"><strong>${change >= 0 ? '+' : ''}${change.toFixed(1)}%</strong></td>
+                        <td><strong>${(countryTotal2024Dec / 1000000).toFixed(1)}</strong></td>
+                        <td><strong>${(countryTotal2025Dec / 1000000).toFixed(1)}</strong></td>
+                        <td colspan="4">-</td>
+                    </tr>
+                `;
+
+                // 리셋
+                countryTotal2024Cum = 0;
+                countryTotal2025Cum = 0;
+                countryTotal2024Dec = 0;
+                countryTotal2025Dec = 0;
+            }
+            currentCountry = row.country;
+        }
+
+        // 백만 루블로 변환
+        const amount2024Cum = row.amount2024_cumulative / 1000000;
+        const amount2025Cum = row.amount2025_cumulative / 1000000;
+        const amount2024Dec = row.amount2024_dec / 1000000;
+        const amount2025Dec = row.amount2025_dec / 1000000;
+
+        // 증감율 계산
+        const change = amount2024Cum > 0
+            ? ((amount2025Cum - amount2024Cum) / amount2024Cum * 100)
+            : (amount2025Cum > 0 ? 100 : 0);
+        const changeClass = change >= 0 ? 'positive' : 'negative';
+
+        // 목표달성률
+        const target = row.target2025;
+        const achievement = target > 0 ? (amount2025Cum / target * 100) : 0;
+        const remaining = target > 0 ? (target - amount2025Cum) : 0;
+
+        // 국가 소계 누적
+        countryTotal2024Cum += row.amount2024_cumulative;
+        countryTotal2025Cum += row.amount2025_cumulative;
+        countryTotal2024Dec += row.amount2024_dec;
+        countryTotal2025Dec += row.amount2025_dec;
+
+        html += `
+            <tr>
+                <td>${row.country}</td>
+                <td>${row.clientNameKr || row.clientNameRu}</td>
+                <td class="editable" data-field="target" data-key="${index}">${target > 0 ? target.toFixed(1) : '-'}</td>
+                <td>${amount2024Cum.toFixed(1)}</td>
+                <td>${amount2025Cum.toFixed(1)}</td>
+                <td class="${changeClass}">${change >= 0 ? '+' : ''}${change.toFixed(1)}%</td>
+                <td>${amount2024Dec > 0 ? amount2024Dec.toFixed(1) : '-'}</td>
+                <td>${amount2025Dec > 0 ? amount2025Dec.toFixed(1) : '-'}</td>
+                <td>${achievement > 0 ? achievement.toFixed(1) + '%' : '-'}</td>
+                <td>${remaining > 0 ? remaining.toFixed(1) : '-'}</td>
+                <td class="editable" data-field="order" data-key="${index}">${row.orderConfirmed > 0 ? row.orderConfirmed.toFixed(1) : '-'}</td>
+                <td class="editable" data-field="note" data-key="${index}">${row.note || ''}</td>
+            </tr>
+        `;
+
+        // 마지막 행인 경우 국가 소계 추가
+        if (index === yoyData.length - 1) {
+            const change = countryTotal2024Cum > 0
+                ? ((countryTotal2025Cum - countryTotal2024Cum) / countryTotal2024Cum * 100)
+                : 0;
+            const changeClass = change >= 0 ? 'positive' : 'negative';
+
+            html += `
+                <tr class="country-row">
+                    <td colspan="2"><strong>${currentCountry} 소계</strong></td>
+                    <td>-</td>
+                    <td><strong>${(countryTotal2024Cum / 1000000).toFixed(1)}</strong></td>
+                    <td><strong>${(countryTotal2025Cum / 1000000).toFixed(1)}</strong></td>
+                    <td class="${changeClass}"><strong>${change >= 0 ? '+' : ''}${change.toFixed(1)}%</strong></td>
+                    <td><strong>${(countryTotal2024Dec / 1000000).toFixed(1)}</strong></td>
+                    <td><strong>${(countryTotal2025Dec / 1000000).toFixed(1)}</strong></td>
+                    <td colspan="4">-</td>
+                </tr>
+            `;
+        }
+    });
+
+    tbody.innerHTML = html;
+
+    // 편집 가능한 셀 클릭 이벤트
+    tbody.querySelectorAll('td.editable').forEach(td => {
+        td.addEventListener('click', function() {
+            makeEditable(this);
+        });
+    });
+}
+
+function makeEditable(td) {
+    if (td.querySelector('input')) return; // 이미 편집 중이면 무시
+
+    const originalValue = td.textContent.trim();
+    const field = td.dataset.field;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'cell-input';
+    input.value = originalValue === '-' ? '' : originalValue;
+
+    input.addEventListener('blur', function() {
+        const newValue = this.value.trim();
+        td.textContent = newValue || '-';
+
+        // TODO: 데이터 저장 로직 (localStorage 또는 Google Sheets)
+        console.log('셀 업데이트:', { field, value: newValue });
+    });
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            this.blur();
+        }
+        if (e.key === 'Escape') {
+            td.textContent = originalValue;
+        }
+    });
+
+    td.textContent = '';
+    td.appendChild(input);
+    input.focus();
+    input.select();
+}
+
+function exportYoyToExcel() {
+    alert('Excel 내보내기 기능은 곧 추가됩니다.');
+    // TODO: CSV 또는 Excel 내보내기 구현
 }

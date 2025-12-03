@@ -640,3 +640,155 @@ tbody td {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* ============================================
+   YoY 보고서 스타일
+   ============================================ */
+.yoy-report-container {
+    background: var(--bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.yoy-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.yoy-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    font-size: 0.85rem;
+    min-width: 1400px;
+}
+
+.yoy-table thead {
+    background: var(--primary-color);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.yoy-table th {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+
+.yoy-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s ease;
+}
+
+.yoy-table tbody tr:hover {
+    background: var(--hover-bg);
+}
+
+.yoy-table tbody tr.country-row {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.dark-mode .yoy-table tbody tr.country-row {
+    background: #2c3e50;
+}
+
+.yoy-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+
+.yoy-table td:nth-child(1),
+.yoy-table td:nth-child(2) {
+    text-align: left;
+    font-weight: 500;
+}
+
+.yoy-table td.positive {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.yoy-table td.negative {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.yoy-table td.editable {
+    background: #fff9e6;
+    cursor: pointer;
+    position: relative;
+}
+
+.dark-mode .yoy-table td.editable {
+    background: #3a3a2a;
+}
+
+.yoy-table td.editable:hover::after {
+    content: '✎';
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.yoy-table input.cell-input {
+    width: 100%;
+    padding: 4px;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.report-period-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--card-bg);
+    border-radius: 6px;
+}
+
+.report-period-selector label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.report-period-selector select {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
