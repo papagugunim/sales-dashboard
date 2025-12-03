@@ -446,13 +446,24 @@ tbody td {
 /* 페이지네이션 */
 .pagination {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
     background: var(--card-bg);
     padding: 15px;
     border-radius: 12px;
     box-shadow: var(--shadow);
+}
+
+.pagination-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.pagination-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .page-btn {

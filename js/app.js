@@ -103,6 +103,9 @@ function setupEventListeners() {
     // YoY 보고서
     document.getElementById('updateYoyReportBtn').addEventListener('click', generateYoyReport);
     document.getElementById('exportYoyBtn').addEventListener('click', exportYoyToExcel);
+
+    // 테이블 Excel 내보내기
+    document.getElementById('exportTableBtn').addEventListener('click', exportTableToExcel);
 }
 
 // ============================================
@@ -1250,4 +1253,121 @@ function exportYoyToExcel() {
     XLSX.writeFile(wb, filename);
 
     console.log(`Excel 파일 내보내기 완료: ${filename}`);
+}
+
+// ============================================
+// 테이블 Excel 내보내기
+// ============================================
+function exportTableToExcel() {
+    // 현재 필터링된 데이터 확인
+    if (filteredData.length === 0) {
+        alert('내보낼 데이터가 없습니다.');
+        return;
+    }
+
+    // Excel 데이터 배열 생성
+    const data = [];
+
+    // 헤더 추가
+    data.push([
+        '날짜',
+        '주문번호',
+        '수량(박스)',
+        '금액(루블)',
+        '할인율(%)',
+        '거래처코드',
+        '거래처명(러시아어)',
+        '거래처명(한국어)',
+        '내수/수출',
+        '나라',
+        '지역',
+        '대리점/연방체인',
+        '제품코드',
+        'CP/NCP',
+        '판매지',
+        '카테고리',
+        '브랜드',
+        '맛',
+        '패키지',
+        '비고'
+    ]);
+
+    // 데이터 행 추가 (필터링된 전체 데이터)
+    filteredData.forEach(item => {
+        // 거래처 정보 가져오기
+        const clientCode = String(item['거래처코드']);
+        const client = clientData.find(c => String(c['거래처코드']) === clientCode);
+
+        // 제품 정보 가져오기
+        const productCode = String(item['제품코드']);
+        const product = productData.find(p => String(p['제품코드']) === productCode);
+
+        const row = [
+            item['날짜'] || '',
+            item['주문번호'] || '',
+            parseFloat(item['수량']) || 0,
+            parseFloat(item['금액']) || 0,
+            parseFloat(item['할인율']) || 0,
+            clientCode,
+            client ? client['거래처명(러시아어)'] : '',
+            client ? client['거래처명(한국어)'] : '',
+            client ? client['내수수출구분'] : '',
+            client ? client['나라'] : '',
+            client ? client['지역'] : '',
+            client ? client['대리점연방체인구분'] : '',
+            productCode,
+            product ? product['CP/NCP'] : '',
+            product ? product['판매지'] : '',
+            product ? product['대분류'] : '',
+            product ? product['지역'] : '',
+            product ? product['맛'] : '',
+            product ? product['패키지'] : '',
+            product ? product['비고'] : ''
+        ];
+
+        data.push(row);
+    });
+
+    // SheetJS 워크북 생성
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // 열 너비 설정
+    ws['!cols'] = [
+        { wch: 12 },  // 날짜
+        { wch: 15 },  // 주문번호
+        { wch: 12 },  // 수량
+        { wch: 12 },  // 금액
+        { wch: 10 },  // 할인율
+        { wch: 12 },  // 거래처코드
+        { wch: 25 },  // 거래처명(러)
+        { wch: 20 },  // 거래처명(한)
+        { wch: 10 },  // 내수/수출
+        { wch: 12 },  // 나라
+        { wch: 12 },  // 지역
+        { wch: 15 },  // 대리점/연방체인
+        { wch: 12 },  // 제품코드
+        { wch: 10 },  // CP/NCP
+        { wch: 12 },  // 판매지
+        { wch: 12 },  // 카테고리
+        { wch: 12 },  // 브랜드
+        { wch: 12 },  // 맛
+        { wch: 12 },  // 패키지
+        { wch: 15 }   // 비고
+    ];
+
+    // 워크북 생성
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '판매 데이터');
+
+    // 파일명 생성 (현재 날짜 포함)
+    const today = new Date();
+    const dateStr = today.getFullYear() +
+                    String(today.getMonth() + 1).padStart(2, '0') +
+                    String(today.getDate()).padStart(2, '0');
+    const filename = `판매데이터_${dateStr}.xlsx`;
+
+    // Excel 파일 다운로드
+    XLSX.writeFile(wb, filename);
+
+    console.log(`Excel 파일 내보내기 완료: ${filename} (${filteredData.length}건)`);
 }

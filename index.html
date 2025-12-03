@@ -246,17 +246,22 @@
             </div>
 
             <div class="pagination">
-                <button id="prevPage" class="page-btn">이전</button>
-                <span class="page-info">
-                    <span id="currentPage">1</span> / <span id="totalPages">1</span> 페이지
-                </span>
-                <button id="nextPage" class="page-btn">다음</button>
-                <select id="itemsPerPage">
-                    <option value="25">25개씩</option>
-                    <option value="50">50개씩</option>
-                    <option value="100" selected>100개씩</option>
-                    <option value="200">200개씩</option>
-                </select>
+                <div class="pagination-left">
+                    <button id="prevPage" class="page-btn">이전</button>
+                    <span class="page-info">
+                        <span id="currentPage">1</span> / <span id="totalPages">1</span> 페이지
+                    </span>
+                    <button id="nextPage" class="page-btn">다음</button>
+                    <select id="itemsPerPage">
+                        <option value="25">25개씩</option>
+                        <option value="50">50개씩</option>
+                        <option value="100" selected>100개씩</option>
+                        <option value="200">200개씩</option>
+                    </select>
+                </div>
+                <div class="pagination-right">
+                    <button id="exportTableBtn" class="export-btn">Excel 내보내기</button>
+                </div>
             </div>
         </div>
 
