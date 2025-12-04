@@ -67,6 +67,28 @@ function setupEventListeners() {
     });
 
     // 필터
+    // 연도 체크박스 필터 이벤트 리스너
+    const yearCheckboxes = document.querySelectorAll('.year-check');
+    yearCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.value === 'all') {
+                // "전체"를 체크하면 다른 모든 체크박스 체크 해제
+                if (this.checked) {
+                    yearCheckboxes.forEach(cb => {
+                        if (cb.value !== 'all') cb.checked = false;
+                    });
+                }
+            } else {
+                // 다른 체크박스를 체크하면 "전체" 체크 해제
+                if (this.checked) {
+                    const allCheckbox = document.querySelector('.year-check[value="all"]');
+                    if (allCheckbox) allCheckbox.checked = false;
+                }
+            }
+            applyFilters();
+        });
+    });
+
     // 월 체크박스 필터 이벤트 리스너
     const monthCheckboxes = document.querySelectorAll('.month-check');
     monthCheckboxes.forEach(checkbox => {
@@ -303,6 +325,12 @@ function populateSelect(elementId, values) {
 // ============================================
 // 필터링
 // ============================================
+// 선택된 연도 체크박스 값들을 배열로 반환
+function getSelectedYears() {
+    const checkedBoxes = document.querySelectorAll('.year-check:checked');
+    return Array.from(checkedBoxes).map(cb => cb.value);
+}
+
 // 선택된 월 체크박스 값들을 배열로 반환
 function getSelectedMonths() {
     const checkedBoxes = document.querySelectorAll('.month-check:checked');
@@ -312,6 +340,7 @@ function getSelectedMonths() {
 function applyFilters() {
     // 모든 필터 값 가져오기
     const filters = {
+        year: getSelectedYears(),
         month: getSelectedMonths(),
         clientCode: document.getElementById('clientCodeFilter').value,
         clientName: document.getElementById('clientNameFilter').value,
@@ -330,6 +359,13 @@ function applyFilters() {
     };
 
     filteredData = salesData.filter(item => {
+        // 연도 필터 (체크박스)
+        if (filters.year.length > 0 && !filters.year.includes('all')) {
+            const itemDate = new Date(item['날짜']);
+            const itemYear = String(itemDate.getFullYear());
+            if (!filters.year.includes(itemYear)) return false;
+        }
+
         // 월 필터 (체크박스)
         if (filters.month.length > 0 && !filters.month.includes('all')) {
             const itemDate = new Date(item['날짜']);
@@ -379,6 +415,10 @@ function applyFilters() {
 }
 
 function resetFilters() {
+    // 연도 체크박스 초기화 (전체만 체크)
+    document.querySelectorAll('.year-check').forEach(cb => {
+        cb.checked = (cb.value === 'all');
+    });
     // 월 체크박스 초기화 (전체만 체크)
     document.querySelectorAll('.month-check').forEach(cb => {
         cb.checked = (cb.value === 'all');
