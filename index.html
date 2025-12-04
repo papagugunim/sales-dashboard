@@ -109,11 +109,62 @@
 
         <div class="filters">
             <!-- 기간 필터 -->
-            <div class="filter-group">
+            <div class="filter-group month-filter-group">
                 <label>기간(월):</label>
-                <select id="monthFilter">
-                    <option value="all">전체</option>
-                </select>
+                <div class="month-checkboxes" id="monthFilter">
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="all" checked>
+                        <span>전체</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="1">
+                        <span>1월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="2">
+                        <span>2월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="3">
+                        <span>3월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="4">
+                        <span>4월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="5">
+                        <span>5월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="6">
+                        <span>6월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="7">
+                        <span>7월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="8">
+                        <span>8월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="9">
+                        <span>9월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="10">
+                        <span>10월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="11">
+                        <span>11월</span>
+                    </label>
+                    <label class="month-checkbox">
+                        <input type="checkbox" class="month-check" value="12">
+                        <span>12월</span>
+                    </label>
+                </div>
             </div>
 
             <!-- 거래처 관련 필터 -->
@@ -216,7 +267,6 @@
                         <tr>
                             <!-- 판매 데이터 -->
                             <th class="sortable" data-column="date">날짜</th>
-                            <th class="sortable" data-column="orderNumber">주문번호</th>
                             <th class="sortable" data-column="quantity">수량(박스)</th>
                             <th class="sortable" data-column="amount">금액(루블)</th>
                             <th class="sortable" data-column="discount">할인율(%)</th>
@@ -240,7 +290,7 @@
                         </tr>
                     </thead>
                     <tbody id="salesTableBody">
-                        <!-- 데이터가 JavaScript로 삽입됩니다 (20개 열) -->
+                        <!-- 데이터가 JavaScript로 삽입됩니다 (19개 열) -->
                     </tbody>
                 </table>
             </div>

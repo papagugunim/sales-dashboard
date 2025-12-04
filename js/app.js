@@ -67,7 +67,27 @@ function setupEventListeners() {
     });
 
     // 필터
-    document.getElementById('monthFilter').addEventListener('change', applyFilters);
+    // 월 체크박스 필터 이벤트 리스너
+    const monthCheckboxes = document.querySelectorAll('.month-check');
+    monthCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.value === 'all') {
+                // "전체"를 체크하면 다른 모든 체크박스 체크 해제
+                if (this.checked) {
+                    monthCheckboxes.forEach(cb => {
+                        if (cb.value !== 'all') cb.checked = false;
+                    });
+                }
+            } else {
+                // 다른 체크박스를 체크하면 "전체" 체크 해제
+                if (this.checked) {
+                    const allCheckbox = document.querySelector('.month-check[value="all"]');
+                    if (allCheckbox) allCheckbox.checked = false;
+                }
+            }
+            applyFilters();
+        });
+    });
     document.getElementById('clientCodeFilter').addEventListener('change', applyFilters);
     document.getElementById('clientNameFilter').addEventListener('change', applyFilters);
     document.getElementById('domesticExportFilter').addEventListener('change', applyFilters);
@@ -224,13 +244,7 @@ async function loadAllData() {
 // 필터 옵션 채우기
 // ============================================
 function populateFilters() {
-    // 월 필터
-    const months = [...new Set(salesData.map(item => {
-        const date = item['날짜'];
-        if (date && date.length >= 7) return date.substring(0, 7);
-        return null;
-    }).filter(m => m))].sort().reverse();
-    populateSelect('monthFilter', months);
+    // 월 필터는 HTML에 하드코딩되어 있음 (체크박스)
 
     // 거래처 관련 필터
     const clientCodes = [...new Set(clientData.map(c => c['거래처코드']).filter(v => v))];
@@ -289,10 +303,16 @@ function populateSelect(elementId, values) {
 // ============================================
 // 필터링
 // ============================================
+// 선택된 월 체크박스 값들을 배열로 반환
+function getSelectedMonths() {
+    const checkedBoxes = document.querySelectorAll('.month-check:checked');
+    return Array.from(checkedBoxes).map(cb => cb.value);
+}
+
 function applyFilters() {
     // 모든 필터 값 가져오기
     const filters = {
-        month: document.getElementById('monthFilter').value,
+        month: getSelectedMonths(),
         clientCode: document.getElementById('clientCodeFilter').value,
         clientName: document.getElementById('clientNameFilter').value,
         domesticExport: document.getElementById('domesticExportFilter').value,
@@ -310,10 +330,11 @@ function applyFilters() {
     };
 
     filteredData = salesData.filter(item => {
-        // 월 필터
-        if (filters.month !== 'all') {
-            const itemMonth = item['날짜'].substring(0, 7);
-            if (itemMonth !== filters.month) return false;
+        // 월 필터 (체크박스)
+        if (filters.month.length > 0 && !filters.month.includes('all')) {
+            const itemDate = new Date(item['날짜']);
+            const itemMonth = String(itemDate.getMonth() + 1); // 1~12
+            if (!filters.month.includes(itemMonth)) return false;
         }
 
         // 거래처 정보 가져오기 (문자열 비교)
@@ -358,7 +379,10 @@ function applyFilters() {
 }
 
 function resetFilters() {
-    document.getElementById('monthFilter').value = 'all';
+    // 월 체크박스 초기화 (전체만 체크)
+    document.querySelectorAll('.month-check').forEach(cb => {
+        cb.checked = (cb.value === 'all');
+    });
     document.getElementById('clientCodeFilter').value = 'all';
     document.getElementById('clientNameFilter').value = 'all';
     document.getElementById('domesticExportFilter').value = 'all';
@@ -468,7 +492,6 @@ function renderTable() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${item['날짜'] || '-'}</td>
-            <td>${item['주문번호'] || '-'}</td>
             <td>${formatNumber(item['수량'] || 0)}</td>
             <td>${formatNumber(item['금액'] || 0)}</td>
             <td>${item['할인율'] ? item['할인율'].toFixed(1) : '0.0'}</td>
@@ -1275,7 +1298,6 @@ function exportTableToExcel() {
     // 헤더 추가
     data.push([
         '날짜',
-        '주문번호',
         '수량(박스)',
         '금액(루블)',
         '할인율(%)',
@@ -1308,7 +1330,6 @@ function exportTableToExcel() {
 
         const row = [
             item['날짜'] || '',
-            item['주문번호'] || '',
             parseFloat(item['수량']) || 0,
             parseFloat(item['금액']) || 0,
             parseFloat(item['할인율']) || 0,
@@ -1338,7 +1359,6 @@ function exportTableToExcel() {
     // 열 너비 설정
     ws['!cols'] = [
         { wch: 12 },  // 날짜
-        { wch: 15 },  // 주문번호
         { wch: 12 },  // 수량
         { wch: 12 },  // 금액
         { wch: 10 },  // 할인율

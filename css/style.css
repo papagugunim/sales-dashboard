@@ -376,6 +376,53 @@ header {
     box-shadow: 0 0 0 3px rgba(95, 125, 149, 0.1);
 }
 
+/* 월 체크박스 필터 */
+.month-filter-group {
+    grid-column: span 4;
+}
+
+.month-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.month-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.month-checkbox:hover {
+    background: var(--card-bg);
+    border-color: var(--primary-color);
+}
+
+.month-checkbox input[type="checkbox"] {
+    margin: 0;
+    margin-right: 6px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.month-checkbox span {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    white-space: nowrap;
+}
+
+.month-checkbox input[type="checkbox"]:checked + span {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
 .reset-btn {
     padding: 10px 20px;
     background: var(--secondary-color);
